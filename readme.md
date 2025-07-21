@@ -1,4 +1,4 @@
-# 🛠️ QueryVerse - Complete Data Platform
+# QueryVerse - Complete Data Platform
 
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://python.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-green.svg)](https://fastapi.tiangolo.com)
@@ -9,17 +9,17 @@ A complete data platform with SQL query engine, DBT transformations, and interac
 
 ![QueryVerse Dashboard](screenshots/screenshot-1-dashboard.png)
 
-## ✨ Features
+## Features
 
-- 📤 **Easy Data Upload** - Drag & drop CSV/Excel files with automatic schema detection and robust parsing
-- 🆕 **Dataset Creator** - Build datasets manually with spreadsheet-like interface  
-- 💻 **SQL Query Engine** - Execute complex SQL queries with real-time results powered by DuckDB
-- ⚙️ **DBT Integration** - One-click data transformations and quality testing
-- 🗄️ **Table Browser** - Explore database schema and table relationships
-- 📊 **Analytics Dashboard** - Monitor platform usage and pipeline health
-- 🚀 **Fast Performance** - Columnar analytics engine with vectorized operations
+-  **Easy Data Upload** - Drag & drop CSV/Excel files with automatic schema detection and robust parsing
+- **Dataset Creator** - Build datasets manually with spreadsheet-like interface  
+- **SQL Query Engine** - Execute complex SQL queries with real-time results powered by DuckDB
+- **DBT Integration** - One-click data transformations and quality testing
+- **Table Browser** - Explore database schema and table relationships
+- **Analytics Dashboard** - Monitor platform usage and pipeline health
+- **Fast Performance** - Columnar analytics engine with vectorized operations
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 - Python 3.8 or higher
@@ -266,29 +266,15 @@ port = int(os.environ.get("PORT", 8001))  # Use 8001 instead
 - Table names are case-sensitive
 - Use schema.table format (e.g., `raw.my_data`)
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+##  Acknowledgments
 
 - **FastAPI** for the excellent async web framework
 - **DuckDB** for the powerful embedded analytics database
 - **Pandas** for robust data manipulation capabilities
 - **VS Code** for the outstanding development experience
-
-## 📞 Support
-
-If you encounter any issues:
-
-1. **Check the terminal output** for detailed error messages
-2. **Review the troubleshooting section** above
-3. **Open an issue** on GitHub with:
-   - Your operating system
-   - Python version (`python --version`)
-   - Error message (if any)
-   - Steps to reproduce
-
----
 
 ⭐ **Happy analyzing!** Star this repository if you find QueryVerse useful for your data projects!
