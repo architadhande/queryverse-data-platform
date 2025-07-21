@@ -7,7 +7,7 @@
 
 A complete data platform with SQL query engine, DBT transformations, and interactive analytics dashboard. Upload CSV/Excel files, transform data, execute custom SQL queries, and visualize results - all in one seamless interface.
 
-![Alt text](./screenshots/upload_page.png)
+![Queryverse_dashboard](./screenshots/upload_page.png)
 
 ## Features
 
@@ -69,28 +69,25 @@ http://localhost:8000/app
 ## Screenshots
 
 ### File Upload & Dataset Creation
-![Upload Interface](screenshots/screenshot-2-upload.png)
+![Upload Interface](screenshots/upload_page.png)
 *Easy drag-and-drop file upload with automatic table creation and robust CSV parsing*
 
-![Create Dataset](screenshots/screenshot-3-create-dataset.png)
+![Create Dataset](screenshots/create_page.png)
 *Built-in dataset creator for manual data entry with spreadsheet-like interface*
 
 ### SQL Query Interface
-![SQL Query](screenshots/screenshot-4-sql-query.png)
+![SQL Query](screenshots/query_page.png)
 *Powerful SQL query editor with available tables sidebar*
 
-![Query Results](screenshots/screenshot-5-results.png)
-*Real-time query execution with formatted results table*
-
 ### Data Transformations
-![DBT Transformations](screenshots/screenshot-6-dbt.png)
+![DBT Transformations](screenshots/dbt_page.png)
 *One-click DBT-style transformations with detailed execution logs*
 
-![Tables Browser](screenshots/screenshot-7-tables.png)
+![Tables Browser](screenshots/table_page.png)
 *Browse and explore all database tables with quick query options*
 
 ### Analytics & Monitoring
-![Analytics Dashboard](screenshots/screenshot-8-analytics.png)
+![Analytics Dashboard](screenshots/analytics_page.png)
 *Real-time analytics and data pipeline health monitoring*
 
 ## Architecture
