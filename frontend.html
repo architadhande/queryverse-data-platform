@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QueryVerse - Data Platform</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
+        
+        .header { background: #2c3e50; color: white; padding: 1rem; }
+        .header h1 { display: inline-block; }
+        .header .info { float: right; margin-top: 5px; }
+        
+        .container { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
+        
+        .tabs { background: white; border-radius: 8px; margin-bottom: 20px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .tab-buttons { display: flex; background: #ecf0f1; border-bottom: 1px solid #bdc3c7; }
+        .tab-button { 
+            flex: 1; padding: 15px; text-align: center; cursor: pointer; border: none; background: none;
+            font-size: 14px; transition: background 0.3s;
+        }
+        .tab-button.active { background: white; border-bottom: 2px solid #3498db; }
+        .tab-button:hover { background: #d5dbdb; }
+        
+        .tab-content { padding: 20px; min-height: 400px; }
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; }
+        
+        .card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .card h3 { margin-bottom: 15px; color: #2c3e50; }
+        
+        .btn { 
+            padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;
+            margin: 5px; transition: background 0.3s;
+        }
+        .btn-primary { background: #3498db; color: white; }
+        .btn-primary:hover { background: #2980b9; }
+        .btn-secondary { background: #95a5a6; color: white; }
+        .btn-secondary:hover { background: #7f8c8d; }
+        .btn-success { background: #27ae60; color: white; }
+        .btn-success:hover { background: #229954; }
+        .btn-danger { background: #e74c3c; color: white; }
+        .btn-danger:hover { background: #c0392b; }
+        .btn:disabled { background: #bdc3c7; cursor: not-allowed; }
+        
+        .upload-area { 
+            border: 2px dashed #3498db; border-radius: 8px; padding: 40px; text-align: center;
+            cursor: pointer; transition: all 0.3s; margin: 20px 0;
+        }
+        .upload-area:hover { background: #ebf3fd; border-color: #2980b9; }
+        
+        .form-control { 
+            width: 100%; padding: 10px; border: 1px solid #bdc3c7; border-radius: 4px;
+            font-size: 14px; margin: 10px 0;
+        }
+        .form-control:focus { outline: none; border-color: #3498db; }
+        
+        .table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        .table th, .table td { padding: 12px; text-align: left; border-bottom: 1px solid #ecf0f1; }
+        .table th { background: #f8f9fa; font-weight: bold; }
+        .table tr:hover { background: #f8f9fa; }
+        
+        .alert { padding: 15px; border-radius: 4px; margin: 10px 0; }
+        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .alert-info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        
+        .stats { display: flex; gap: 20px; margin: 20px 0; }
+        .stat-card { flex: 1; text-align: center; padding: 20px; background: white; border-radius: 8px; }
+        .stat-number { font-size: 2em; font-weight: bold; color: #3498db; }
+        .stat-label { color: #7f8c8d; margin-top: 5px; }
+        
+        .loading { text-align: center; padding: 20px; }
+        .spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3; 
+                   border-top: 3px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .table-container { max-height: 400px; overflow-y: auto; border: 1px solid #ecf0f1; border-radius: 4px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        
+        /* Dataset Creator Styles */
+        .dataset-creator { border: 1px solid #ddd; border-radius: 8px; padding: 20px; margin: 20px 0; }
+        .column-input { display: flex; gap: 10px; margin: 10px 0; align-items: center; }
+        .column-input input { flex: 1; }
+        .data-grid { display: grid; gap: 10px; margin: 20px 0; }
+        .data-row { display: grid; gap: 10px; align-items: center; }
+        .row-number { background: #f8f9fa; padding: 8px; text-align: center; border-radius: 4px; font-weight: bold; }
+        
+        @media (max-width: 768px) {
+            .grid { grid-template-columns: 1fr; }
+            .tab-buttons { flex-direction: column; }
+            .stats { flex-direction: column; }
+            .column-input { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🛠️ QueryVerse</h1>
+        <div class="info">
+            <span id="tableCount">0 Tables</span> | 
+            <span id="status">Ready</span>
+        </div>
+        <div style="clear: both;"></div>
+    </div>
+
+    <div class="container">
+        <!-- Alert area -->
+        <div id="alertArea"></div>
+
+        <!-- Main tabs -->
+        <div class="tabs">
+            <div class="tab-buttons">
+                <button class="tab-button active" onclick="showTab('upload')">📤 Upload Data</button>
+                <button class="tab-button" onclick="showTab('create')">🆕 Create Dataset</button>
+                <button class="tab-button" onclick="showTab('query')">💻 SQL Query</button>
+                <button class="tab-button" onclick="showTab('tables')">🗄️ Tables</button>
+                <button class="tab-button" onclick="showTab('dbt')">⚙️ DBT</button>
+                <button class="tab-button" onclick="showTab('analytics')">📊 Analytics</button>
+            </div>
+
+            <div class="tab-content">
+                <!-- Upload Tab -->
+                <div id="upload" class="tab-pane active">
+                    <div class="grid">
+                        <div class="card">
+                            <h3>Upload CSV/Excel File</h3>
+                            <p>Upload existing files to get started with your data pipeline.</p>
+                            
+                            <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                                <input type="file" id="fileInput" accept=".csv,.xlsx,.xls" style="display: none;">
+                                <div id="uploadContent">
+                                    <div style="font-size: 3em; color: #3498db;">📁</div>
+                                    <p>Click to select a file</p>
+                                    <small>Supports CSV, XLSX, XLS files</small>
+                                </div>
+                            </div>
+
+                            <button class="btn btn-primary" onclick="uploadFile()">📤 Upload Selected File</button>
+                        </div>
+
+                        <div class="card">
+                            <h3>Upload Status</h3>
+                            <div id="uploadResult">
+                                <p>No files uploaded yet. Upload a file to see details here.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Create Dataset Tab -->
+                <div id="create" class="tab-pane">
+                    <div class="card">
+                        <h3>🆕 Create Your Own Dataset</h3>
+                        <p>Manually create a dataset by defining columns and entering data.</p>
+                        
+                        <div class="dataset-creator">
+                            <h4>Step 1: Dataset Name</h4>
+                            <input type="text" id="datasetName" class="form-control" placeholder="Enter dataset name (e.g., 'sales_data')" value="my_dataset">
+                            
+                            <h4>Step 2: Define Columns</h4>
+                            <div id="columnsSection">
+                                <div class="column-input">
+                                    <input type="text" placeholder="Column Name" value="id">
+                                    <select>
+                                        <option value="text">Text</option>
+                                        <option value="number">Number</option>
+                                        <option value="date">Date</option>
+                                    </select>
+                                    <button class="btn btn-danger" onclick="removeColumn(this)">❌</button>
+                                </div>
+                                <div class="column-input">
+                                    <input type="text" placeholder="Column Name" value="name">
+                                    <select>
+                                        <option value="text">Text</option>
+                                        <option value="number">Number</option>
+                                        <option value="date">Date</option>
+                                    </select>
+                                    <button class="btn btn-danger" onclick="removeColumn(this)">❌</button>
+                                </div>
+                                <div class="column-input">
+                                    <input type="text" placeholder="Column Name" value="amount">
+                                    <select>
+                                        <option value="text">Text</option>
+                                        <option value="number" selected>Number</option>
+                                        <option value="date">Date</option>
+                                    </select>
+                                    <button class="btn btn-danger" onclick="removeColumn(this)">❌</button>
+                                </div>
+                            </div>
+                            
+                            <button class="btn btn-secondary" onclick="addColumn()">➕ Add Column</button>
+                            <button class="btn btn-primary" onclick="generateDataGrid()">📋 Create Data Grid</button>
+                            
+                            <h4>Step 3: Enter Data</h4>
+                            <div id="dataGrid">
+                                <p>Click "Create Data Grid" to start entering data.</p>
+                            </div>
+                            
+                            <button class="btn btn-success" onclick="saveDataset()" id="saveDatasetBtn" style="display: none;">💾 Save Dataset</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Query Tab -->
+                <div id="query" class="tab-pane">
+                    <div class="grid">
+                        <div style="grid-column: 1 / -1;">
+                            <div class="card">
+                                <h3>SQL Query Editor</h3>
+                                <textarea id="sqlQuery" class="form-control" rows="8" placeholder="Enter your SQL query here...
+Example: SELECT * FROM information_schema.tables LIMIT 10">SELECT * FROM information_schema.tables LIMIT 10</textarea>
+                                <button class="btn btn-primary" onclick="executeQuery()">▶️ Execute Query</button>
+                                <button class="btn btn-secondary" onclick="clearQuery()">🗑️ Clear</button>
+                            </div>
+                        </div>
+
+                        <div style="grid-column: 1 / -1;">
+                            <div class="card">
+                                <h3>Query Results</h3>
+                                <div id="queryResults">
+                                    <p>Execute a query to see results here.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tables Tab -->
+                <div id="tables" class="tab-pane">
+                    <div class="card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h3>Database Tables</h3>
+                            <button class="btn btn-secondary" onclick="loadTables()">🔄 Refresh</button>
+                        </div>
+                        <div id="tablesList">
+                            <p>Loading tables...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DBT Tab -->
+                <div id="dbt" class="tab-pane">
+                    <div class="grid">
+                        <div class="card">
+                            <h3>DBT Operations</h3>
+                            <p>Transform your data using DBT commands.</p>
+                            
+                            <button class="btn btn-primary" onclick="runDBT('run')">▶️ DBT Run</button>
+                            <button class="btn btn-secondary" onclick="runDBT('test')">✅ DBT Test</button>
+                            <button class="btn btn-secondary" onclick="runDBT('docs generate')">📚 Generate Docs</button>
+                        </div>
+
+                        <div class="card">
+                            <h3>DBT Output</h3>
+                            <div id="dbtOutput">
+                                <p>Run a DBT command to see output here.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics Tab -->
+                <div id="analytics" class="tab-pane">
+                    <div class="card">
+                        <h3>Platform Analytics</h3>
+                        <div class="stats">
+                            <div class="stat-card">
+                                <div class="stat-number" id="totalTables">0</div>
+                                <div class="stat-label">Total Tables</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" id="totalRows">0</div>
+                                <div class="stat-label">Total Rows</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" id="lastUpdated">Never</div>
+                                <div class="stat-label">Last Updated</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Pipeline Status</h3>
+                        <div class="stats">
+                            <div class="stat-card" id="statusUpload">
+                                <div class="stat-number">⭕</div>
+                                <div class="stat-label">Upload</div>
+                            </div>
+                            <div class="stat-card" id="statusDBT">
+                                <div class="stat-number">⭕</div>
+                                <div class="stat-label">DBT</div>
+                            </div>
+                            <div class="stat-card" id="statusQuery">
+                                <div class="stat-number">⭕</div>
+                                <div class="stat-label">Query</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number">✅</div>
+                                <div class="stat-label">Platform</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000';
+        
+        // Tab switching
+        function showTab(tabName) {
+            // Hide all tab panes
+            document.querySelectorAll('.tab-pane').forEach(pane => {
+                pane.classList.remove('active');
+            });
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Show alerts
+        function showAlert(message, type = 'info') {
+            const alertArea = document.getElementById('alertArea');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.innerHTML = message;
+            alertArea.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
+        // Set status
+        function setStatus(status) {
+            document.getElementById('status').textContent = status;
+        }
+
+        // File upload - FIXED VERSION
+        async function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showAlert('❌ Please select a file first', 'error');
+                return;
+            }
+
+            setStatus('Uploading...');
+            document.getElementById('uploadContent').innerHTML = '<div class="spinner"></div><p>Uploading...</p>';
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch(`${API_BASE}/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showAlert(`✅ Successfully uploaded ${file.name}`, 'success');
+                    document.getElementById('uploadResult').innerHTML = `
+                        <h4>✅ Upload Successful!</h4>
+                        <p><strong>File:</strong> ${result.filename}</p>
+                        <p><strong>Table:</strong> ${result.table_name}</p>
+                        <p><strong>Rows:</strong> ${result.rows.toLocaleString()}</p>
+                        <p><strong>Columns:</strong> ${result.columns.length}</p>
+                        <p><strong>Column Names:</strong> ${result.columns.join(', ')}</p>
+                    `;
+                    document.getElementById('statusUpload').innerHTML = '<div class="stat-number">✅</div><div class="stat-label">Upload</div>';
+                    loadTables();
+                    loadAnalytics();
+                } else {
+                    showAlert('❌ Upload failed: ' + (result.detail || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                console.error('Upload error:', error);
+                showAlert('❌ Upload failed: ' + error.message, 'error');
+            }
+
+            setStatus('Ready');
+            document.getElementById('uploadContent').innerHTML = `
+                <div style="font-size: 3em; color: #3498db;">📁</div>
+                <p>Click to select another file</p>
+                <small>Supports CSV, XLSX, XLS files</small>
+            `;
+        }
+
+        // Dataset Creator Functions
+        function addColumn() {
+            const columnsSection = document.getElementById('columnsSection');
+            const newColumn = document.createElement('div');
+            newColumn.className = 'column-input';
+            newColumn.innerHTML = `
+                <input type="text" placeholder="Column Name">
+                <select>
+                    <option value="text">Text</option>
+                    <option value="number">Number</option>
+                    <option value="date">Date</option>
+                </select>
+                <button class="btn btn-danger" onclick="removeColumn(this)">❌</button>
+            `;
+            columnsSection.appendChild(newColumn);
+        }
+
+        function removeColumn(button) {
+            button.parentElement.remove();
+        }
+
+        function generateDataGrid() {
+            const columnInputs = document.querySelectorAll('#columnsSection .column-input');
+            const columns = [];
+            
+            columnInputs.forEach(input => {
+                const name = input.querySelector('input').value.trim();
+                const type = input.querySelector('select').value;
+                if (name) {
+                    columns.push({ name, type });
+                }
+            });
+
+            if (columns.length === 0) {
+                showAlert('❌ Please add at least one column', 'error');
+                return;
+            }
+
+            const dataGrid = document.getElementById('dataGrid');
+            let html = '<div class="data-grid" style="grid-template-columns: 50px ' + 'repeat(' + columns.length + ', 1fr);">';
+            
+            // Header row
+            html += '<div class="row-number">#</div>';
+            columns.forEach(col => {
+                html += `<div style="background: #3498db; color: white; padding: 8px; text-align: center; border-radius: 4px; font-weight: bold;">${col.name}</div>`;
+            });
+
+            // Data rows (start with 5 empty rows)
+            for (let i = 1; i <= 5; i++) {
+                html += `<div class="row-number">${i}</div>`;
+                columns.forEach((col, colIndex) => {
+                    let inputType = 'text';
+                    let placeholder = col.name;
+                    let value = '';
+                    
+                    // Add sample data for demonstration
+                    if (i === 1) {
+                        if (col.name.toLowerCase().includes('id')) value = '1';
+                        else if (col.name.toLowerCase().includes('name')) value = 'John Doe';
+                        else if (col.name.toLowerCase().includes('amount') || col.type === 'number') value = '100';
+                        else if (col.type === 'date') value = '2024-01-01';
+                        else value = 'Sample Data';
+                    }
+                    
+                    if (col.type === 'number') inputType = 'number';
+                    else if (col.type === 'date') inputType = 'date';
+                    
+                    html += `<input type="${inputType}" class="form-control" placeholder="${placeholder}" data-row="${i}" data-col="${colIndex}" value="${value}">`;
+                });
+            }
+            
+            html += '</div>';
+            html += '<button class="btn btn-secondary" onclick="addDataRow()">➕ Add Row</button>';
+            
+            dataGrid.innerHTML = html;
+            document.getElementById('saveDatasetBtn').style.display = 'inline-block';
+        }
+
+        function addDataRow() {
+            const dataGrid = document.querySelector('.data-grid');
+            const columns = document.querySelectorAll('#columnsSection .column-input');
+            const existingRows = document.querySelectorAll('.row-number').length - 1; // Subtract header
+            const newRowNum = existingRows + 1;
+
+            // Add row number
+            const rowNumDiv = document.createElement('div');
+            rowNumDiv.className = 'row-number';
+            rowNumDiv.textContent = newRowNum;
+            dataGrid.appendChild(rowNumDiv);
+
+            // Add input fields for each column
+            columns.forEach((columnInput, colIndex) => {
+                const colName = columnInput.querySelector('input').value.trim();
+                const colType = columnInput.querySelector('select').value;
+                
+                const input = document.createElement('input');
+                input.type = colType === 'number' ? 'number' : colType === 'date' ? 'date' : 'text';
+                input.className = 'form-control';
+                input.placeholder = colName;
+                input.setAttribute('data-row', newRowNum);
+                input.setAttribute('data-col', colIndex);
+                
+                dataGrid.appendChild(input);
+            });
+        }
+
+        async function saveDataset() {
+            const datasetName = document.getElementById('datasetName').value.trim();
+            if (!datasetName) {
+                showAlert('❌ Please enter a dataset name', 'error');
+                return;
+            }
+
+            // Get column definitions
+            const columnInputs = document.querySelectorAll('#columnsSection .column-input');
+            const columns = [];
+            columnInputs.forEach(input => {
+                const name = input.querySelector('input').value.trim();
+                const type = input.querySelector('select').value;
+                if (name) {
+                    columns.push(name);
+                }
+            });
+
+            // Get data from grid
+            const dataInputs = document.querySelectorAll('.data-grid input[data-row]');
+            const data = {};
+            
+            // Initialize data structure
+            columns.forEach(col => {
+                data[col] = [];
+            });
+
+            // Group data by rows
+            const rowData = {};
+            dataInputs.forEach(input => {
+                const row = parseInt(input.getAttribute('data-row'));
+                const col = parseInt(input.getAttribute('data-col'));
+                const value = input.value.trim();
+                
+                if (!rowData[row]) rowData[row] = {};
+                rowData[row][col] = value;
+            });
+
+            // Convert to column-based format and filter out empty rows
+            Object.keys(rowData).forEach(rowNum => {
+                const row = rowData[rowNum];
+                const hasData = Object.values(row).some(val => val !== '');
+                
+                if (hasData) {
+                    columns.forEach((colName, colIndex) => {
+                        data[colName].push(row[colIndex] || '');
+                    });
+                }
+            });
+
+            // Check if we have any data
+            if (data[columns[0]].length === 0) {
+                showAlert('❌ Please enter some data', 'error');
+                return;
+            }
+
+            try {
+                setStatus('Saving dataset...');
+                
+                // Convert to CSV format for upload
+                let csvContent = columns.join(',') + '\n';
+                for (let i = 0; i < data[columns[0]].length; i++) {
+                    const row = columns.map(col => data[col][i] || '').join(',');
+                    csvContent += row + '\n';
+                }
+
+                // Create a blob and upload it
+                const blob = new Blob([csvContent], { type: 'text/csv' });
+                const formData = new FormData();
+                formData.append('file', blob, `${datasetName}.csv`);
+
+                const response = await fetch(`${API_BASE}/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showAlert(`✅ Dataset "${datasetName}" created successfully!`, 'success');
+                    document.getElementById('statusUpload').innerHTML = '<div class="stat-number">✅</div><div class="stat-label">Create</div>';
+                    loadTables();
+                    loadAnalytics();
+                    
+                    // Switch to tables tab to show the new dataset
+                    showTab('tables');
+                    document.querySelector('[onclick="showTab(\'tables\')"]').classList.add('active');
+                } else {
+                    showAlert('❌ Failed to save dataset: ' + (result.detail || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                console.error('Save dataset error:', error);
+                showAlert('❌ Failed to save dataset: ' + error.message, 'error');
+            }
+
+            setStatus('Ready');
+        }
+
+        // Execute SQL query
+        async function executeQuery() {
+            const query = document.getElementById('sqlQuery').value.trim();
+            if (!query) return;
+
+            setStatus('Executing query...');
+            document.getElementById('queryResults').innerHTML = '<div class="loading"><div class="spinner"></div> Executing query...</div>';
+
+            try {
+                const response = await fetch(`${API_BASE}/query`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query: query })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showAlert('✅ Query executed successfully', 'success');
+                    
+                    let html = `<p><strong>${result.row_count}</strong> rows returned</p>`;
+                    
+                    if (result.data.length > 0) {
+                        html += '<div class="table-container"><table class="table"><thead><tr>';
+                        result.columns.forEach(col => {
+                            html += `<th>${col}</th>`;
+                        });
+                        html += '</tr></thead><tbody>';
+                        
+                        result.data.slice(0, 100).forEach(row => {
+                            html += '<tr>';
+                            result.columns.forEach(col => {
+                                const value = row[col] !== null && row[col] !== undefined ? String(row[col]) : '';
+                                html += `<td>${value.substring(0, 100)}</td>`;
+                            });
+                            html += '</tr>';
+                        });
+                        
+                        html += '</tbody></table></div>';
+                        if (result.data.length > 100) {
+                            html += '<p><em>Showing first 100 rows of ' + result.row_count + ' total rows</em></p>';
+                        }
+                    }
+                    
+                    document.getElementById('queryResults').innerHTML = html;
+                    document.getElementById('statusQuery').innerHTML = '<div class="stat-number">✅</div><div class="stat-label">Query</div>';
+                } else {
+                    showAlert('❌ Query failed: ' + result.error, 'error');
+                    document.getElementById('queryResults').innerHTML = `<div class="alert alert-error"><strong>Error:</strong> ${result.error}</div>`;
+                }
+            } catch (error) {
+                showAlert('❌ Query failed: ' + error.message, 'error');
+                document.getElementById('queryResults').innerHTML = `<div class="alert alert-error"><strong>Error:</strong> ${error.message}</div>`;
+            }
+
+            setStatus('Ready');
+        }
+
+        // Clear query
+        function clearQuery() {
+            document.getElementById('sqlQuery').value = '';
+            document.getElementById('queryResults').innerHTML = '<p>Execute a query to see results here.</p>';
+        }
+
+        // Load tables
+        async function loadTables() {
+            document.getElementById('tablesList').innerHTML = '<div class="loading"><div class="spinner"></div> Loading tables...</div>';
+
+            try {
+                const response = await fetch(`${API_BASE}/tables`);
+                const result = await response.json();
+
+                if (result.success) {
+                    let html = '';
+                    if (result.tables.length === 0) {
+                        html = '<p>No tables found. Upload some data or create a dataset to get started!</p>';
+                    } else {
+                        html = '<div class="grid">';
+                        result.tables.forEach(table => {
+                            html += `
+                                <div class="card">
+                                    <h4>${table.name}</h4>
+                                    <p><strong>Schema:</strong> ${table.schema}</p>
+                                    <button class="btn btn-primary" onclick="queryTable('${table.full_name}')">🔍 Query</button>
+                                </div>
+                            `;
+                        });
+                        html += '</div>';
+                    }
+                    document.getElementById('tablesList').innerHTML = html;
+                    document.getElementById('tableCount').textContent = `${result.tables.length} Tables`;
+                } else {
+                    document.getElementById('tablesList').innerHTML = '<div class="alert alert-error">Failed to load tables</div>';
+                }
+            } catch (error) {
+                document.getElementById('tablesList').innerHTML = '<div class="alert alert-error">Failed to load tables: ' + error.message + '</div>';
+            }
+        }
+
+        // Query a specific table
+        function queryTable(tableName) {
+            document.getElementById('sqlQuery').value = `SELECT * FROM ${tableName} LIMIT 10`;
+            showTab('query');
+            document.querySelector('[onclick="showTab(\'query\')"]').classList.add('active');
+        }
+
+        // Run DBT commands
+        async function runDBT(command) {
+            setStatus(`Running DBT ${command}...`);
+            document.getElementById('dbtOutput').innerHTML = `<div class="loading"><div class="spinner"></div> Running DBT ${command}...</div>`;
+
+            try {
+                const response = await fetch(`${API_BASE}/dbt/${command}`, {
+                    method: 'POST'
+                });
+
+                const result = await response.json();
+
+                let html = '';
+                if (result.success) {
+                    showAlert(`✅ DBT ${command} completed successfully`, 'success');
+                    html = '<div class="alert alert-success">✅ Command completed successfully</div>';
+                    document.getElementById('statusDBT').innerHTML = '<div class="stat-number">✅</div><div class="stat-label">DBT</div>';
+                } else {
+                    showAlert(`❌ DBT ${command} failed`, 'error');
+                    html = '<div class="alert alert-error">❌ Command failed</div>';
+                }
+
+                if (result.stdout) {
+                    html += `<h4>Output:</h4><pre style="background: #f8f9fa; padding: 15px; border-radius: 4px; overflow-x: auto;">${result.stdout}</pre>`;
+                }
+
+                if (result.stderr) {
+                    html += `<h4>Errors:</h4><pre style="background: #f8d7da; padding: 15px; border-radius: 4px; overflow-x: auto;">${result.stderr}</pre>`;
+                }
+
+                document.getElementById('dbtOutput').innerHTML = html;
+                
+                if (result.success) {
+                    loadTables(); // Refresh tables after successful DBT run
+                }
+            } catch (error) {
+                showAlert('❌ DBT command failed: ' + error.message, 'error');
+                document.getElementById('dbtOutput').innerHTML = `<div class="alert alert-error">Failed to run DBT command: ${error.message}</div>`;
+            }
+
+            setStatus('Ready');
+        }
+
+        // Load analytics
+        async function loadAnalytics() {
+            try {
+                const response = await fetch(`${API_BASE}/analytics`);
+                const result = await response.json();
+
+                if (result.success) {
+                    document.getElementById('totalTables').textContent = result.summary.total_tables;
+                    document.getElementById('totalRows').textContent = result.summary.total_rows.toLocaleString();
+                    document.getElementById('lastUpdated').textContent = new Date(result.summary.last_updated).toLocaleDateString();
+                }
+            } catch (error) {
+                console.error('Failed to load analytics:', error);
+            }
+        }
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTables();
+            loadAnalytics();
+            setStatus('Ready');
+        });
+    </script>
+</body>
+</html>
