@@ -7,7 +7,7 @@
 
 A complete data platform with SQL query engine, DBT transformations, and interactive analytics dashboard. Upload CSV/Excel files, transform data, execute custom SQL queries, and visualize results - all in one seamless interface.
 
-![QueryVerse Dashboard](screenshots/screenshot-1-dashboard.png)
+![QueryVerse Dashboard](screenshots/upload.png)
 
 ## Features
 
