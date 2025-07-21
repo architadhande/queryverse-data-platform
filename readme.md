@@ -66,7 +66,7 @@ python backend.py
 http://localhost:8000/app
 ```
 
-## 📸 Screenshots
+## Screenshots
 
 ### File Upload & Dataset Creation
 ![Upload Interface](screenshots/screenshot-2-upload.png)
@@ -93,7 +93,7 @@ http://localhost:8000/app
 ![Analytics Dashboard](screenshots/screenshot-8-analytics.png)
 *Real-time analytics and data pipeline health monitoring*
 
-## 🏗️ Architecture
+## Architecture
 
 QueryVerse uses a simple yet powerful architecture perfect for local development and prototyping:
 
@@ -127,7 +127,7 @@ QueryVerse uses a simple yet powerful architecture perfect for local development
 | **Transformations** | SQL | Direct SQL transformations on DuckDB |
 | **Development** | VS Code | IDE with Python debugging support |
 
-## 💻 Development in VS Code
+## Development in VS Code
 
 ### Recommended VS Code Extensions
 - **Python** (Microsoft) - Essential for Python development
@@ -159,7 +159,7 @@ Create `.vscode/launch.json` for debugging:
 }
 ```
 
-## 📊 Use Cases
+## Use Cases
 
 - **Business Intelligence** - Quick data analysis and reporting for small teams
 - **Data Exploration** - Interactive data discovery and ad-hoc querying
@@ -168,7 +168,7 @@ Create `.vscode/launch.json` for debugging:
 - **Personal Projects** - Analyze personal data, CSVs, spreadsheets
 - **Small Business Analytics** - Sales analysis, customer insights, reporting
 
-## 🔧 Project Structure
+## Project Structure
 
 ```
 queryverse-data-platform/
@@ -184,7 +184,7 @@ queryverse-data-platform/
 └── queryverse.db        # DuckDB database file (auto-created)
 ```
 
-## 🧪 Example Workflow
+## Example Workflow
 
 1. **Start the application** in VS Code terminal
 2. **Upload a CSV file** (e.g., sales data, customer data)
@@ -200,7 +200,7 @@ queryverse-data-platform/
 6. **View analytics** to monitor your data pipeline
 7. **Create custom datasets** for testing and development
 
-## 🚀 Performance & Capabilities
+## Performance & Capabilities
 
 ### What QueryVerse Handles Well
 - **Medium datasets** (up to 1GB CSV files)
@@ -216,7 +216,7 @@ queryverse-data-platform/
 - **Memory Usage**: Efficient with columnar storage
 - **Response Time**: <100ms for typical analytical queries
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Here's how to get started:
 
@@ -234,7 +234,7 @@ Contributions are welcome! Here's how to get started:
 - Test with various CSV file formats
 - Update screenshots if UI changes are made
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
